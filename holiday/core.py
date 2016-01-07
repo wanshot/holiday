@@ -3,6 +3,7 @@ import re
 from .exceptions import ParseError
 
 # cron方式もやる？
+# http://www.nncron.ru/help/EN/working/cron-format.html
 # TIME_SYNTAX_RE = re.compile(r"^.+\s+.+\s+.+\s+.+$")
 
 
@@ -41,41 +42,40 @@ class Holiday(object):
     - base class
     """
 
-    def __init__(self, dates=[], reverse=False):
+    def __init__(self, dates=[], is_reverse=False):
 
         self.dates = dates
-        self._reverse = reverse
+        self._is_reverse = is_reverse
 
     def is_business_day(self, *args):
         """
         """
         return ""
 
-    def _parse_time():
+    def get_term_count_holidays(self, start_date, end_date):
         """
         """
         return ""
 
-    def _parse_year():
+    def _parse_dates(self):
         """
         """
         return ""
 
-    def _parse_month():
+    def _parse_year(self):
         """
         """
         return ""
 
-    def _parse_day():
+    def _parse_month(self):
         """
         """
         return ""
 
-
-class ParseValues(object):
-    """
-    """
-    pass
+    def _parse_day(self):
+        """
+        """
+        return ""
 
 
 holiday = Holiday([SAT, SUN] + [
