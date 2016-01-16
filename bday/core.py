@@ -1,32 +1,16 @@
 # -*- coding: utf-8 -*-
-import re
 from .exceptions import ParseError, PeriodRangeError
-# from .parser import DateParser
+from .parser import ParseDate
 
-
-MONTH_MAP = {
-    1: "jan",
-    2: "feb",
-    3: "mar",
-    4: "apr",
-    5: "may",
-    6: "jun",
-    7: "jul",
-    8: "aug",
-    9: "sep",
-    10: "oct",
-    11: "nov",
-    12: "dec",
-}
 
 WEEK_MAP = {
-    "sun": "0",
-    "mon": "1",
-    "tue": "2",
-    "wed": "3",
-    "thu": "4",
-    "fri": "5",
-    "sat": "6"
+    "mon": 1,
+    "tue": 2,
+    "wed": 3,
+    "thu": 4,
+    "fri": 5,
+    "sat": 6,
+    "sun": 7,
 }
 
 SAT = ('*', '*', '*', 'sat', '*')
@@ -61,7 +45,7 @@ class Holiday(object):
     Base class
     """
 
-    IS_TIMES = set()
+    _IS_TIMES = set()
 
     def __init__(self, times):
         """
@@ -71,38 +55,42 @@ class Holiday(object):
         #   │   │   │   │   │
         #   │   │   │   │   │
         #   │   │   │   │   └─  number of week (1 - 5)
-        #   │   │   │   └─── day of week (0 - 7) (0 to 6 are Sunday to Saturday)
+        #   │   │   │   └─── day of week (1 to 7 are Sunday to Saturday)
         #   │   │   └───── day of month (1 - 31)
         #   │   └─────── month (1 - 12)
-        #   └───────── year (0 - 9999)
+        #   └───────── year (1 - 9999)
         :param boolian is_reverse: return the opposite result
         """
+
         if isinstance(times, list):
             for time in times:
                 if isinstance(time, tuple) and len(time) == 5:
-                    self.IS_TIMES.add(True)
+                    self._IS_TIMES.add(True)
                 else:
-                    self.IS_TIMES.add(False)
+                    self._IS_TIMES.add(False)
 
-        if len(self.IS_TIMES) == 1:
+        if len(self._IS_TIMES) == 1:
             self.years = zip(*times)[0]
             self.months = zip(*times)[1]
             self.days = zip(*times)[2]
             self.weeks = zip(*times)[3]
             self.number_weeks = zip(*times)[4]
 
-    def is_business_day(self, date, is_reverse=False):
+    def is_business_day(self, date):
         """ get is_business_day
 
         :param date_object: Exsample >>>date(2000, 1, 1)
         :return: return the result of boolian
         """
-        return ""
 
-    def get_period_count_holidays(self, start_date=None, end_date=None):
-        """
-        """
-        return ""
+        parsed_date = ParseDate(date).as_dict()
+        data = self._create_data_structure()
+        print data
+
+        if len([v for k, v in parsed_date.items() if v in data[k]]) == 5:
+            return True
+
+        return False
 
     def _create_data_structure(self):
         """ create_data_structure
@@ -116,26 +104,38 @@ class Holiday(object):
         for time_name, v in TIME_START_TO_END.items():
 
             if '*' in self.__dict__[time_name]:
-                time_data[time_name] = range(v["start"], v["end"]+1)
+                time_data[time_name] = range(v['start'], v['end']+1)
+
+            elif time_name == 'weeks':
+                checked_weeks = self._check_weeks_string(self.__dict__[time_name])
+                week_nums = [WEEK_MAP[week] for week in checked_weeks]
+                time_data[time_name] = week_nums
+
             else:
-                period = self._check_time_format(time_name, set(self.__dict__[time_name]))
+                period = self._check_int_time_format(
+                    time_name,
+                    set(self.__dict__[time_name])
+                )
                 time_data[time_name] = period
 
         return time_data
 
-    def _check_time_format(self, time_name, values):
+    def _check_int_time_format(self, time_name, values):
         """ check time
 
-        :param time name of String time_name: years or months or days or weeks or number week
+        :param time name of String time_name: years or months or days or number week
         :param List of times values: Number or the asterisk in the list
         :return: It returns a value if there is no exception
         """
+
         period = TIME_START_TO_END[time_name]
 
         for value in values:
+
             if not isinstance(value, int):
                 raise TypeError("'%s' is not an int" % value)
-            if value in range(period["start"], period["end"]+1):
+
+            if value not in range(period["start"], period["end"]+1):
                 raise PeriodRangeError("'%d' is outside the scope of the period "
                                        "'%s' range: '%d' to '%d'" % (
                                            value,
@@ -145,10 +145,17 @@ class Holiday(object):
 
         return values
 
+    def _check_weeks_string(self, values):
+        """ check weeks
 
-if __name__ == '__name__':
-    holiday = Holiday([
-        ('*', '*', '*', '*', '*'),
-    ])
+        :param List of weeks values: List of day of the week
+        :return: It returns a value if there is no exception
+        """
 
-    print holiday.days
+        exclude_weeks = set()
+        checked_weeks = [v if v in WEEK_MAP else exclude_weeks.add(v) for v in values]
+
+        if not len(exclude_weeks):
+            return checked_weeks
+
+        raise ParseError("The value could not be Perth")
