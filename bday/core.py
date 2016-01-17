@@ -45,7 +45,7 @@ class Holiday(object):
     Base class
     """
 
-    _IS_TIMES = set()
+    _IS_TIMES = []
 
     def __init__(self, times):
         """
@@ -65,11 +65,11 @@ class Holiday(object):
         if isinstance(times, list):
             for time in times:
                 if isinstance(time, tuple) and len(time) == 5:
-                    self._IS_TIMES.add(True)
+                    self._IS_TIMES.append(True)
                 else:
-                    self._IS_TIMES.add(False)
+                    self._IS_TIMES.append(False)
 
-        if len(self._IS_TIMES) == 1:
+        if all(self._IS_TIMES):
             self.years = zip(*times)[0]
             self.months = zip(*times)[1]
             self.days = zip(*times)[2]
@@ -77,15 +77,15 @@ class Holiday(object):
             self.number_weeks = zip(*times)[4]
 
     def is_business_day(self, date):
-        """ get is_business_day
+        """ whether business day
 
         :param date_object: Exsample >>>date(2000, 1, 1)
         :return: return the result of boolian
+        :rtype: boolian
         """
 
         parsed_date = ParseDate(date).as_dict()
         data = self._create_data_structure()
-        print data
 
         if len([v for k, v in parsed_date.items() if v in data[k]]) == 5:
             return True
@@ -96,6 +96,7 @@ class Holiday(object):
         """ create_data_structure
 
         :return: return dict of time name keys and period values
+        :rtype: dict
         :Exsample: >>> {"years": [2000, 2001], "months": set([11,12]), ...}
         """
 
@@ -125,6 +126,8 @@ class Holiday(object):
 
         :param time name of String time_name: years or months or days or number week
         :param List of times values: Number or the asterisk in the list
+        :rtype: list
+        :raises PeriodRangeError: outside the scope of the period
         :return: It returns a value if there is no exception
         """
 
@@ -149,6 +152,8 @@ class Holiday(object):
         """ check weeks
 
         :param List of weeks values: List of day of the week
+        :rtype: list
+        :raises ParseError: When the value can not be parsed
         :return: It returns a value if there is no exception
         """
 

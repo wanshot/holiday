@@ -12,7 +12,11 @@ class ParseDate(object):
         self.week_number = _extract_week_number(date)
 
     def as_dict(self):
-        """ date to dict """
+        """ date to dict
+
+        :rtype: dict
+        :return: times dict
+        """
 
         return {
             "years": self.year,
