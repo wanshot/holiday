@@ -13,6 +13,6 @@ __author__ = 'wanshot'
 __author_email__ = 'nishikawa0228@sj9.so-net.ne.jp'
 
 
-from .core import bday
+from .core import Holiday
 from .exceptions import ParseError, PeriodRangeError
 from .parser import ParseDate
