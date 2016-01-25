@@ -9,8 +9,8 @@ from bday import (
     __author_email__,
 )
 
-__name__ = 'bday'
-__url__ = 'https://github.com/wanshot/bday'
+__name__ = 'holiday'
+__url__ = 'https://github.com/wanshot/holiday'
 
 __short_description__ = __name__ + ' is a package to generate testdata.'
 __long_description__ = open('./README.rst', 'r').read()
