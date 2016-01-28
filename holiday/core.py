@@ -17,7 +17,7 @@ WEEK_MAP = {
     "thu": 4,
     "fri": 5,
     "sat": 6,
-    "sun": 7,
+    "sun": (7, 0),
 }
 
 SAT = ('*', '*', '*', 'sat', '*')
@@ -51,18 +51,21 @@ class Holiday(object):
         #   └───────── year (1 - 9999)
         """
 
-        valid_data = self._clean_holiday_arg(times)
+        is_checked = self._check_holiday_arg(times)
+        d = defaultdict(set)
 
-        self.years,
-        self.months,
-        self.days,
-        self.weeks,
-        self.number_weeks
+        if is_checked:
+            for time in times:
+                for idx, (year, month, day, day_of_week, num_of_week) in enumerate(time):
+                    self.years = d[year].add(idx)
+                    self.months = d[month].add(idx)
+                    self.days = d[day].add(idx)
+                    if isinstance(time, str):
+                        day_of_week = WEEK_MAP[day_of_week]
+                    self.day_of_weeks = d[day_of_week].add(idx)
+                    self.num_of_weeks = d[num_of_week].add(idx)
 
-        for idx, year, month, day, week, number_week in enumerate(valid_data):
-
-
-    def _clean_holiday_arg(times):
+    def _check_holiday_arg(times):
 
         if not isinstance(times, list):
             raise TypeError("an list is required")
@@ -74,40 +77,10 @@ class Holiday(object):
                 raise TypeError("Target time takes at most 5 arguments"
                                 " ('%d' given)" % len(time))
             if len(time) < 5:
-                tuple_labels = ("year", "month", "day", "day of week", "number of week")
+                time_labels_order = ("year", "month", "day", "day of week", "number of week")
                 raise TypeError("Required argument '%s' (pos '%d')"
-                                " not found" % (tuple_labels[len(time)], len(time)))
-
-        return time
-
-    def _create_data_structure(self):
-        """ create_data_structure
-
-        :return: return dict of time name keys and period values
-        :rtype: dict
-        :Example: >>> {"years": [2000, 2001], "months": set([11,12]), ...}
-        """
-
-        time_data = {}
-
-        for time_name, (start, end) in TIME_RANGES.items():
-
-            if '*' in self.__dict__[time_name]:
-                time_data[time_name] = range(v['start'], v['end']+1)
-
-            elif time_name == 'weeks':
-                checked_weeks = self._check_weeks_string(self.__dict__[time_name])
-                week_nums = [WEEK_MAP[week] for week in checked_weeks]
-                time_data[time_name] = week_nums
-
-            else:
-                period = self._check_int_time_format(
-                    time_name,
-                    set(self.__dict__[time_name])
-                )
-                time_data[time_name] = period
-
-        return time_data
+                                " not found" % (time_labels_order[len(time)], len(time)))
+        return True
 
     def _check_int_time_format(self, time_name, values):
         """ check time
@@ -151,18 +124,9 @@ class Holiday(object):
 
         raise ParseError("The value could not be perse")
 
-    def is_holiday(self, date=_date.today()):
+    def is_holiday(self, date, cron=None):
         """ whether holiday
-
-        :param date_object: Example >>>date(2000, 1, 1)
-        :return: return the result of boolean
-        :rtype: boolean
         """
 
-        parsed_date = ParseDate(date).as_dict()
-        data = self._create_data_structure()
-
-        if len([v for k, v in parsed_date.items() if v in data[k]]) == 5:
-            return True
-
-        return False
+        result = []
+        week_num = date.isoweekday()
