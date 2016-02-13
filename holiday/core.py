@@ -40,6 +40,7 @@ class Holiday(object):
     def __init__(self, times):
         """
         :param tuple of list times: plz see below
+        """
         # ('*', '*', '*', '*', '*')
         #   ┬   ┬   ┬   ┬   ┬
         #   │   │   │   │   │
@@ -49,38 +50,44 @@ class Holiday(object):
         #   │   │   └───── day of month (1 - 31)
         #   │   └─────── month (1 - 12)
         #   └───────── year (1 - 9999)
-        """
 
-        is_checked = self._check_holiday_arg(times)
-        d = defaultdict(set)
+        self._check_arg(times)
 
-        if is_checked:
-            for time in times:
-                for idx, (year, month, day, day_of_week, num_of_week) in enumerate(time):
-                    self.years = d[year].add(idx)
-                    self.months = d[month].add(idx)
-                    self.days = d[day].add(idx)
-                    if isinstance(time, str):
-                        day_of_week = WEEK_MAP[day_of_week]
-                    self.day_of_weeks = d[day_of_week].add(idx)
-                    self.num_of_weeks = d[num_of_week].add(idx)
+        self.years = defaultdict(set)
+        self.months = defaultdict(set)
+        self.days = defaultdict(set)
+        self.day_of_weeks = defaultdict(set)
+        self.num_of_weeks = defaultdict(set)
 
-    def _check_holiday_arg(times):
+        func = lambda d, key, value: d[key].add(value)
+
+        for idx, (year, month, day, day_of_week, num_of_week) in enumerate(times):
+            func(self.years, year, idx)
+            func(self.months, month, idx)
+            func(self.days, day, idx)
+            if isinstance(day_of_week, str):
+                day_of_week = WEEK_MAP[day_of_week]
+            func(self.day_of_weeks, day_of_week, idx)
+            func(self.num_of_weeks, num_of_week, idx)
+
+    def _check_arg(self, times):
 
         if not isinstance(times, list):
             raise TypeError("an list is required")
 
         for time in times:
+
             if not isinstance(time, tuple):
                 raise TypeError("an tuple is required")
+
             if len(time) > 5:
                 raise TypeError("Target time takes at most 5 arguments"
                                 " ('%d' given)" % len(time))
+
             if len(time) < 5:
                 time_labels_order = ("year", "month", "day", "day of week", "number of week")
                 raise TypeError("Required argument '%s' (pos '%d')"
                                 " not found" % (time_labels_order[len(time)], len(time)))
-        return True
 
     def _check_int_time_format(self, time_name, values):
         """ check time
