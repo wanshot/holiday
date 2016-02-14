@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
+from collections import (
+    defaultdict,
+    OrderedDict,
+)
 from datetime import date as _date
-from collections import defaultdict
+from itertools import product, combinations
 
 from .exceptions import (
     ParseError,
@@ -20,16 +24,16 @@ WEEK_MAP = {
     "sun": 7,
 }
 
-SAT = ('*', '*', '*', 'sat', '*')
-SUN = ('*', '*', '*', 'sun', '*')
+_time_data = (
+    ("year", (1, 9999)),
+    ("month", (1, 12)),
+    ("day", (1, 31)),
+    ("day_of_week", (1, 7)),
+    ("num_of_week", (1, 6)),
+)
 
-TIME_RANGES = {
-    'year': (1, 9999),
-    'month': (1, 12),
-    'day': (1, 31),
-    'day of week': (1, 7),
-    'number of week': (1, 5),
-}
+TIME_INFO = OrderedDict()
+TIME_INFO.update(OrderedDict(_time_data))
 
 
 class Holiday(object):
@@ -53,27 +57,27 @@ class Holiday(object):
 
         self._check_times(times)
 
-        self.years = defaultdict(set)
-        self.months = defaultdict(set)
-        self.days = defaultdict(set)
-        self.day_of_weeks = defaultdict(set)
-        self.num_of_weeks = defaultdict(set)
+        self.year = defaultdict(set)
+        self.month = defaultdict(set)
+        self.day = defaultdict(set)
+        self.day_of_week = defaultdict(set)
+        self.num_of_week = defaultdict(set)
 
         func = lambda d, key, value: d[key].add(value)
 
         for idx, (year, month, day, day_of_week, num_of_week) in enumerate(times):
-            func(self.years, year, idx)
-            func(self.months, month, idx)
-            func(self.days, day, idx)
-            func(self.day_of_weeks, day_of_week, idx)
-            func(self.num_of_weeks, num_of_week, idx)
+            func(self.year, year, idx)
+            func(self.month, month, idx)
+            func(self.day, day, idx)
+            func(self.day_of_week, day_of_week, idx)
+            func(self.num_of_week, num_of_week, idx)
 
     def _check_times(self, times):
 
         if not isinstance(times, list):
             raise TypeError("an list is required")
 
-        time_labels_order = ("year", "month", "day", "day of week", "number of week")
+        time_labels_order = ("year", "month", "day", "day_of_week", "num_of_week")
         for time in times:
 
             if not isinstance(time, tuple):
@@ -104,14 +108,14 @@ class Holiday(object):
             if value == "*":
                 continue
 
-            if label == "day of week":
-                if isinstance(value, str):
+            if label == "day_of_week":
+                if isinstance(value, (str, unicode)):
                     value = WEEK_MAP[value]
 
             if not isinstance(value, int):
                 raise TypeError("'%s' is not an int" % value)
 
-            start, end = TIME_RANGES[label]
+            start, end = TIME_INFO[label]
 
             if not start <= value <= end:
                 raise PeriodRangeError("'%d' is outside the scope of the period "
@@ -124,5 +128,27 @@ class Holiday(object):
     def is_holiday(self, date, cron=None):
         """
         """
+        time = [
+            date.year,
+            date.month,
+            date.day,
+            date.isoweekday(),
+            _extract_week_number(date)
+        ]
 
-        week_num = date.isoweekday()
+        target = []
+        for key, date in list(zip(TIME_INFO.keys(), time)):
+            d = getattr(self, key)
+            asterisk = d.get("*", set())
+            s = asterisk.union(d.get(date, set()))
+            target.append(list(s))
+
+        for result in map(set, product(*target)):
+            if len(result) == 1:
+                return True
+        return False
+
+
+def _extract_week_number(date):
+    first_date = date.replace(day=1)
+    return int(date.strftime('%W')) - int(first_date.strftime('%W')) + 1
