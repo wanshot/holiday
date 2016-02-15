@@ -5,7 +5,7 @@ from collections import (
     OrderedDict,
 )
 from datetime import date as _date
-from itertools import product, combinations
+from itertools import product
 
 from .exceptions import (
     ParseError,
@@ -24,6 +24,8 @@ WEEK_MAP = {
     "sun": 7,
 }
 
+ORDER_WEEK = OrderedDict({v: k for k, v in WEEK_MAP.items()})
+
 _time_data = (
     ("year", (1, 9999)),
     ("month", (1, 12)),
@@ -34,6 +36,7 @@ _time_data = (
 
 TIME_INFO = OrderedDict()
 TIME_INFO.update(OrderedDict(_time_data))
+TIME_LABEL = TIME_INFO.keys()
 
 
 class Holiday(object):
@@ -73,11 +76,12 @@ class Holiday(object):
             func(self.num_of_week, num_of_week, idx)
 
     def _check_times(self, times):
+        """
+        """
 
         if not isinstance(times, list):
             raise TypeError("an list is required")
 
-        time_labels_order = ("year", "month", "day", "day_of_week", "num_of_week")
         for time in times:
 
             if not isinstance(time, tuple):
@@ -89,9 +93,9 @@ class Holiday(object):
 
             if len(time) < 5:
                 raise TypeError("Required argument '%s' (pos '%d')"
-                                " not found" % (time_labels_order[len(time)], len(time)))
+                                " not found" % (TIME_LABEL[len(time)], len(time)))
 
-            self._check_int_time_format(time_labels_order, time)
+            self._check_int_time_format(TIME_LABEL, time)
 
     def _check_int_time_format(self, labels, values):
         """ check time
@@ -110,20 +114,38 @@ class Holiday(object):
 
             if label == "day_of_week":
                 if isinstance(value, (str, unicode)):
-                    value = WEEK_MAP[value]
+                    if value not in WEEK_MAP.keys():
+                        raise TypeError("'%s' is not day of the week. "
+                                        "character is the only '%s'" % (
+                                            value, ', '.join(ORDER_WEEK.values())
+                                        ))
 
-            if not isinstance(value, int):
-                raise TypeError("'%s' is not an int" % value)
+            if label in ["year", "month", "day", "num_of_week"]:
 
-            start, end = TIME_INFO[label]
+                if not isinstance(value, int):
+                    raise TypeError("'%s' is not an int" % value)
 
-            if not start <= value <= end:
-                raise PeriodRangeError("'%d' is outside the scope of the period "
-                                       "'%s' range: '%d' to '%d'" % (
-                                           value, label, start, end
-                                       ))
+                start, end = TIME_INFO[label]
 
-        return values
+                if not start <= value <= end:
+                    raise PeriodRangeError("'%d' is outside the scope of the period "
+                                           "'%s' range: '%d' to '%d'" % (
+                                               value, label, start, end
+                                           ))
+
+    def _convert_holiday_format(self, times):
+        """
+        """
+        result = []
+
+        for year, month, day, day_of_week, num_of_week in times:
+
+            if isinstance(day_of_week, (str, unicode)):
+                day_of_week = WEEK_MAP.get(day_of_week, "*")
+
+            result.append((year, month, day, day_of_week, num_of_week))
+
+        return result
 
     def is_holiday(self, date, cron=None):
         """
@@ -137,7 +159,7 @@ class Holiday(object):
         ]
 
         target = []
-        for key, date in list(zip(TIME_INFO.keys(), time)):
+        for key, date in list(zip(TIME_LABEL, time)):
             d = getattr(self, key)
             asterisk = d.get("*", set())
             s = asterisk.union(d.get(date, set()))
@@ -147,6 +169,11 @@ class Holiday(object):
             if len(result) == 1:
                 return True
         return False
+
+    def is_business_day(self):
+        """
+        """
+        return not(self.is_holiday)
 
 
 def _extract_week_number(date):
