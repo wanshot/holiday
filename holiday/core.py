@@ -73,6 +73,10 @@ class Holiday(object):
 
     def _check_holiday_structure(self, times):
         """ To check the structure of the HolidayClass
+
+        :param list times: years or months or days or number week
+        :rtype: None or Exception
+        :return: in the case of exception returns the exception
         """
 
         if not isinstance(times, list):
@@ -93,11 +97,12 @@ class Holiday(object):
     def _check_time_format(self, labels, values):
         """ To check the format of the times
 
-        :param time name of String time_name: years or months or days or number week
-        :param List of times values: Number or the asterisk in the list
-        :rtype: list
+        :param list labels: years or months or days or number week
+        :param list values: number or the asterisk in the list
+        :rtype: None or Exception
         :raises PeriodRangeError: outside the scope of the period
-        :return: It returns a value if there is no exception
+        :raises ParseError: not parse the day of the week
+        :return: in the case of exception returns the exception
         """
 
         for label, value in zip(labels, values):
@@ -121,7 +126,10 @@ class Holiday(object):
                                                value, label, start, end))
 
     def is_holiday(self, date, cron=None):
-        """
+        """ Whether holiday judges
+
+        :param datetime date: datetime.date object
+        :rtype: bool
         """
         time = [
             date.year,
@@ -144,7 +152,9 @@ class Holiday(object):
         return False
 
     def is_business_day(self):
-        """
+        """ Whether the business day
+
+        :rtype: bool
         """
         return not(self.is_holiday)
 
