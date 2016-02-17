@@ -4,14 +4,12 @@ from collections import (
     defaultdict,
     OrderedDict,
 )
-# from datetime import date as _date
 from itertools import product
 
 from .exceptions import (
     ParseError,
     PeriodRangeError
 )
-from .parser import ParseDate
 
 
 WEEK_MAP = OrderedDict((
@@ -56,7 +54,7 @@ class Holiday(object):
         #   │   └─────── month (1 - 12)
         #   └───────── year (1 - 9999)
 
-        self._check_times(times)
+        self._check_holiday_structure(times)
 
         self.year = defaultdict(set)
         self.month = defaultdict(set)
@@ -73,8 +71,8 @@ class Holiday(object):
             self.day_of_week[day_of_week].add(idx)
             self.num_of_week[num_of_week].add(idx)
 
-    def _check_times(self, times):
-        """
+    def _check_holiday_structure(self, times):
+        """ To check the structure of the HolidayClass
         """
 
         if not isinstance(times, list):
@@ -90,10 +88,10 @@ class Holiday(object):
                 raise TypeError("Required argument '%s' (pos '%d')"
                                 " not found" % (TIME_LABEL[len(time)], len(time)))
 
-            self._check_int_time_format(TIME_LABEL, time)
+            self._check_time_format(TIME_LABEL, time)
 
-    def _check_int_time_format(self, labels, values):
-        """ check time
+    def _check_time_format(self, labels, values):
+        """ To check the format of the times
 
         :param time name of String time_name: years or months or days or number week
         :param List of times values: Number or the asterisk in the list
