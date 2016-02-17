@@ -4,7 +4,7 @@ from collections import (
     defaultdict,
     OrderedDict,
 )
-from datetime import date as _date
+# from datetime import date as _date
 from itertools import product
 
 from .exceptions import (
@@ -65,11 +65,13 @@ class Holiday(object):
         self.num_of_week = defaultdict(set)
 
         for idx, (year, month, day, day_of_week, num_of_week) in enumerate(times):
-            self.year = self.year["year"].add(idx)
-            self.month = self.year["month"].add(idx)
-            self.day = self.year["day"].add(idx)
-            self.day_of_week = self.year["day_of_week"].add(idx)
-            self.num_of_week = self.year["num_of_week"].add(idx)
+            if isinstance(day_of_week, (str, unicode)):
+                day_of_week = WEEK_MAP.get(day_of_week, "*")
+            self.year[year].add(idx)
+            self.month[month].add(idx)
+            self.day[day].add(idx)
+            self.day_of_week[day_of_week].add(idx)
+            self.num_of_week[num_of_week].add(idx)
 
     def _check_times(self, times):
         """
@@ -80,7 +82,7 @@ class Holiday(object):
 
         for time in times:
             if not isinstance(time, tuple):
-                raise TypeError("an tuple is required")
+                raise TypeError("a tuple is required")
             if len(time) > 5:
                 raise TypeError("Target time takes at most 5 arguments"
                                 " ('%d' given)" % len(time))
@@ -105,10 +107,10 @@ class Holiday(object):
                 continue
             if label == "day_of_week":
                 if isinstance(value, (str, unicode)):
-                    if value not in WEEK_MAP.keys():
-                        raise TypeError("'%s' is not day of the week. "
-                                        "character is the only '%s'" % (
-                                            value, ', '.join(ORDER_WEEK.values())))
+                    if value not in ORDER_WEEK:
+                        raise ParseError("'%s' is not day of the week. "
+                                         "character is the only '%s'" % (
+                                             value, ', '.join(ORDER_WEEK)))
 
             if label in ["year", "month", "day", "num_of_week"]:
                 if not isinstance(value, int):
@@ -119,20 +121,6 @@ class Holiday(object):
                     raise PeriodRangeError("'%d' is outside the scope of the period "
                                            "'%s' range: '%d' to '%d'" % (
                                                value, label, start, end))
-
-    def _convert_holiday_format(self, times):
-        """
-        """
-        result = []
-
-        for year, month, day, day_of_week, num_of_week in times:
-
-            if isinstance(day_of_week, (str, unicode)):
-                day_of_week = WEEK_MAP.get(day_of_week, "*")
-
-            result.append((year, month, day, day_of_week, num_of_week))
-
-        return result
 
     def is_holiday(self, date, cron=None):
         """
