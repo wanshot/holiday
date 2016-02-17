@@ -14,28 +14,26 @@ from .exceptions import (
 from .parser import ParseDate
 
 
-WEEK_MAP = {
-    "mon": 1,
-    "tue": 2,
-    "wed": 3,
-    "thu": 4,
-    "fri": 5,
-    "sat": 6,
-    "sun": 7,
-}
+WEEK_MAP = OrderedDict((
+    ("mon", 1),
+    ("tue", 2),
+    ("wed", 3),
+    ("thu", 4),
+    ("fri", 5),
+    ("sat", 6),
+    ("sun", 7),
+))
 
-ORDER_WEEK = OrderedDict({v: k for k, v in WEEK_MAP.items()})
+ORDER_WEEK = WEEK_MAP.keys()
 
-_time_data = (
+TIME_INFO = OrderedDict((
     ("year", (1, 9999)),
     ("month", (1, 12)),
     ("day", (1, 31)),
     ("day_of_week", (1, 7)),
     ("num_of_week", (1, 6)),
-)
+))
 
-TIME_INFO = OrderedDict()
-TIME_INFO.update(OrderedDict(_time_data))
 TIME_LABEL = TIME_INFO.keys()
 
 
@@ -66,14 +64,12 @@ class Holiday(object):
         self.day_of_week = defaultdict(set)
         self.num_of_week = defaultdict(set)
 
-        func = lambda d, key, value: d[key].add(value)
-
         for idx, (year, month, day, day_of_week, num_of_week) in enumerate(times):
-            func(self.year, year, idx)
-            func(self.month, month, idx)
-            func(self.day, day, idx)
-            func(self.day_of_week, day_of_week, idx)
-            func(self.num_of_week, num_of_week, idx)
+            self.year = self.year["year"].add(idx)
+            self.month = self.year["month"].add(idx)
+            self.day = self.year["day"].add(idx)
+            self.day_of_week = self.year["day_of_week"].add(idx)
+            self.num_of_week = self.year["num_of_week"].add(idx)
 
     def _check_times(self, times):
         """
@@ -83,14 +79,11 @@ class Holiday(object):
             raise TypeError("an list is required")
 
         for time in times:
-
             if not isinstance(time, tuple):
                 raise TypeError("an tuple is required")
-
             if len(time) > 5:
                 raise TypeError("Target time takes at most 5 arguments"
                                 " ('%d' given)" % len(time))
-
             if len(time) < 5:
                 raise TypeError("Required argument '%s' (pos '%d')"
                                 " not found" % (TIME_LABEL[len(time)], len(time)))
@@ -108,30 +101,24 @@ class Holiday(object):
         """
 
         for label, value in zip(labels, values):
-
             if value == "*":
                 continue
-
             if label == "day_of_week":
                 if isinstance(value, (str, unicode)):
                     if value not in WEEK_MAP.keys():
                         raise TypeError("'%s' is not day of the week. "
                                         "character is the only '%s'" % (
-                                            value, ', '.join(ORDER_WEEK.values())
-                                        ))
+                                            value, ', '.join(ORDER_WEEK.values())))
 
             if label in ["year", "month", "day", "num_of_week"]:
-
                 if not isinstance(value, int):
                     raise TypeError("'%s' is not an int" % value)
 
                 start, end = TIME_INFO[label]
-
                 if not start <= value <= end:
                     raise PeriodRangeError("'%d' is outside the scope of the period "
                                            "'%s' range: '%d' to '%d'" % (
-                                               value, label, start, end
-                                           ))
+                                               value, label, start, end))
 
     def _convert_holiday_format(self, times):
         """
@@ -159,10 +146,10 @@ class Holiday(object):
         ]
 
         target = []
-        for key, date in list(zip(TIME_LABEL, time)):
+        for key, data in list(zip(TIME_LABEL, time)):
             d = getattr(self, key)
             asterisk = d.get("*", set())
-            s = asterisk.union(d.get(date, set()))
+            s = asterisk.union(d.get(data, set()))
             target.append(list(s))
 
         for result in map(set, product(*target)):
