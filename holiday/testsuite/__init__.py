@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
 
 """
-    bday
-    ~~~~
+    holiday
+    ~~~~~~~
     :copyright: (c) 2016 by wanshot.
     :license: MIT, see LICENSE for more details.
+
+    SpecialThanks
+    ~~~~~~~~~~~~~
+    @crohaco: The review and gave me an idea
+    @tell-k: It taught me pipy debut way
+
 """
 
 import sys
