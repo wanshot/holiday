@@ -3,7 +3,10 @@
 import unittest
 from datetime import date
 from holiday.core import Holiday
-from holiday.exceptions import ParseError, PeriodRangeError
+from holiday.exceptions import (
+    ParseError,
+    PeriodRangeError,
+)
 
 
 class TestHoliday(unittest.TestCase):

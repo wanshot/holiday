@@ -119,6 +119,7 @@ class Holiday(object):
                 if not isinstance(value, int):
                     raise TypeError("'%s' is not an int" % value)
 
+            if isinstance(value, int):
                 start, end = TIME_INFO[label]
                 if not start <= value <= end:
                     raise PeriodRangeError("'%d' is outside the scope of the period "
