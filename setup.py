@@ -2,7 +2,7 @@
 # coding: utf-8
 
 from setuptools import setup, find_packages
-from bday import (
+from holiday import (
     __version__,
     __license__,
     __author__,
@@ -12,7 +12,7 @@ from bday import (
 __name__ = 'holiday'
 __url__ = 'https://github.com/wanshot/holiday'
 
-__short_description__ = __name__ + ' is a package to generate testdata.'
+__short_description__ = __name__ + ' is a package to generate holiday.'
 __long_description__ = open('./README.rst', 'r').read()
 
 __classifiers__ = [
