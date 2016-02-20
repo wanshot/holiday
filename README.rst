@@ -3,7 +3,7 @@ Judgment whether the holiday
 Requiremants
 ----------------
 
-- Python 2.7
+- Python 2.7 or later.
 
 Install
 ----------------

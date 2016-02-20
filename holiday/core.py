@@ -10,6 +10,7 @@ from .exceptions import (
     ParseError,
     PeriodRangeError
 )
+from ._compat import string_types
 
 
 WEEK_MAP = OrderedDict((
@@ -63,7 +64,7 @@ class Holiday(object):
         self.num_of_week = defaultdict(set)
 
         for idx, (year, month, day, day_of_week, num_of_week) in enumerate(times):
-            if isinstance(day_of_week, (str, unicode)):
+            if isinstance(day_of_week, string_types):
                 day_of_week = WEEK_MAP.get(day_of_week, "*")
             self.year[year].add(idx)
             self.month[month].add(idx)
@@ -109,7 +110,7 @@ class Holiday(object):
             if value == "*":
                 continue
             if label == "day_of_week":
-                if isinstance(value, (str, unicode)):
+                if isinstance(value, string_types):
                     if value not in ORDER_WEEK:
                         raise ParseError("'%s' is not day of the week. "
                                          "character is the only '%s'" % (
