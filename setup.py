@@ -20,6 +20,7 @@ __classifiers__ = [
     'Programming Language :: Python',
     'Development Status :: 5 - Production/Stable',
     'Topic :: Software Development',
+    'Programming Language :: Python :: 2',
 ]
 
 __keywords__ = [
@@ -40,5 +41,5 @@ setup(
     classifiers=__classifiers__,
     keywords=' ,'.join(__keywords__),
     license=__license__,
-    packages=find_packages(exclude=['*.tests', '*.tests.*']),
+    packages=find_packages(exclude=['*.tests', '*.tests.*', 'tests*']),
 )

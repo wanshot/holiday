@@ -152,7 +152,7 @@ class Holiday(object):
                 return True
         return False
 
-    def is_business_day(self):
+    def is_business_day(self, date, cron=None):
         """ Whether the business day
 
         :rtype: bool
