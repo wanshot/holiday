@@ -46,13 +46,13 @@ class Holiday(object):
         :param tuple of list times: plz see below
         """
         # ('*', '*', '*', '*', '*')
-        #   ┬   ┬   ┬   ┬   ┬
-        #   │   │   │   │   │
-        #   │   │   │   │   │
-        #   │   │   │   │   └─  number of week (1 - 5)
-        #   │   │   │   └─── day of week (1 to 7 are Sunday to Saturday)
-        #   │   │   └───── day of month (1 - 31)
-        #   │   └─────── month (1 - 12)
+        #   ┬    ┬    ┬    ┬    ┬
+        #   │    │    │    │    │
+        #   │    │    │    │    │
+        #   │    │    │    │    └─  number of week (1 - 5)
+        #   │    │    │    └─── day of week (1 to 7 or mon to sun)
+        #   │    │    └───── day of month (1 - 31)
+        #   │    └─────── month (1 - 12)
         #   └───────── year (1 - 9999)
 
         self._check_holiday_structure(times)
