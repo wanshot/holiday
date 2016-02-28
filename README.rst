@@ -19,13 +19,13 @@ holiday format
 ::
 
    ('*', '*', '*', '*', '*')
-     ┬   ┬   ┬   ┬   ┬
-     │   │   │   │   │
-     │   │   │   │   │
-     │   │   │   │   └─  number of week (1 - 5)
-     │   │   │   └─── day of week (1 to 7 monday to sunday)
-     │   │   └───── day of month (1 - 31)
-     │   └─────── month (1 - 12)
+     ┬    ┬    ┬    ┬    ┬
+     │    │    │    │    │
+     │    │    │    │    │
+     │    │    │    │    └─  number of week (1 - 5)
+     │    │    │    └─── day of week (1 to 7 monday to sunday)
+     │    │    └───── day of month (1 - 31)
+     │    └─────── month (1 - 12)
      └───────── year (1 - 9999)
 
    "*" The asterisk allows all
@@ -69,7 +69,7 @@ Usage
     >>> holiday = Holiday([
     ...     ("*", "*", "*", "*", "*"),
     ... ])
-    >>> holiday.is_holiday(date(2016, 1, 1))  # 2016-1-1 Friday 1
+    >>> holiday.is_business_day(date(2016, 1, 1))  # 2016-1-1 Friday 1
     True
     >>> holiday.is_business_day(date(2016, 1, 2))  # 2016-1-3 Sunday 1
     False
