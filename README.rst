@@ -72,9 +72,9 @@ Usage
     ...     ('*', '*', '*', '*', '*'),
     ... ])
 
-    >>> holiday.is_business_day(date(2016, 1, 1))  # 2016-1-1 Friday 1
+    >>> holiday.is_holiday(date(2016, 1, 1))  # 2016-1-1 Friday 1
     True
-    >>> holiday.is_business_day(date(2016, 1, 2))  # 2016-1-3 Sunday 1
+    >>> holiday.is_business_day(date(2016, 1, 1))  # 2016-1-1 Friday 1
     False
 
 License
