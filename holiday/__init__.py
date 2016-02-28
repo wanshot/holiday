@@ -8,8 +8,8 @@
 
     SpecialThanks
     ~~~~~~~~~~~~~
-    @crohaco: The review and gave me an idea
-    @tell-k: It taught me pipy debut way
+    @crohaco: He gave holiday idea to me and he did a review
+    @tell-k: He taught me pypi debut way
 
 """
 
