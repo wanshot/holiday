@@ -2,7 +2,6 @@
 
 import unittest
 from datetime import date
-from holiday.core import Holiday
 from holiday.exceptions import (
     ParseError,
     PeriodRangeError,
@@ -10,15 +9,26 @@ from holiday.exceptions import (
 
 
 class TestHoliday(unittest.TestCase):
+    """ Test Command
+    python -m unittest discover
+    """
+
+    def _getTargetFunc(self):
+        from holiday.core import Holiday
+        return Holiday
+
+    def _makeOne(self):
+        return self._getTargetFunc()
 
     def test_with_ok_map_day_of_week(self):
-        mon = Holiday([(2015, 12, 28, "mon", 5)])
-        tue = Holiday([(2015, 12, 29, "tue", 5)])
-        wed = Holiday([(2015, 12, 30, "wed", 5)])
-        thu = Holiday([(2015, 12, 31, "thu", 5)])
-        fri = Holiday([(2016, 1, 1, "fri", 1)])
-        sat = Holiday([(2016, 1, 2, "sat", 1)])
-        sun = Holiday([(2016, 1, 3, "sun", 1)])
+
+        mon = self._makeOne()([(2015, 12, 28, "mon", 5)])
+        tue = self._makeOne()([(2015, 12, 29, "tue", 5)])
+        wed = self._makeOne()([(2015, 12, 30, "wed", 5)])
+        thu = self._makeOne()([(2015, 12, 31, "thu", 5)])
+        fri = self._makeOne()([(2016, 1, 1, "fri", 1)])
+        sat = self._makeOne()([(2016, 1, 2, "sat", 1)])
+        sun = self._makeOne()([(2016, 1, 3, "sun", 1)])
         self.assertTrue(mon.is_holiday(date(2015, 12, 28)))
         self.assertTrue(tue.is_holiday(date(2015, 12, 29)))
         self.assertTrue(wed.is_holiday(date(2015, 12, 30)))
@@ -28,32 +38,32 @@ class TestHoliday(unittest.TestCase):
         self.assertTrue(sun.is_holiday(date(2016, 1, 3)))
 
     def test_with_ok_asterisk_year(self):
-        asterisk = Holiday([("*", 1, 1, "fri", 1)])
+        asterisk = self._makeOne()([("*", 1, 1, "fri", 1)])
         self.assertTrue(asterisk.is_holiday(date(2016, 1, 1)))
 
     def test_with_ok_asterisk_month(self):
-        asterisk = Holiday([(2016, "*", 1, "fri", 1)])
+        asterisk = self._makeOne()([(2016, "*", 1, "fri", 1)])
         self.assertTrue(asterisk.is_holiday(date(2016, 1, 1)))
 
     def test_with_ok_asterisk_day(self):
-        asterisk = Holiday([(2016, 1, "*", "fri", 1)])
+        asterisk = self._makeOne()([(2016, 1, "*", "fri", 1)])
         self.assertTrue(asterisk.is_holiday(date(2016, 1, 1)))
 
     def test_with_ok_asterisk_day_of_week(self):
-        asterisk = Holiday([(2016, 1, 1, "*", 1)])
+        asterisk = self._makeOne()([(2016, 1, 1, "*", 1)])
         self.assertTrue(asterisk.is_holiday(date(2016, 1, 1)))
 
     def test_with_ok_asterisk_num_of_week(self):
-        asterisk = Holiday([(2016, 1, 1, "fri", "*")])
+        asterisk = self._makeOne()([(2016, 1, 1, "fri", "*")])
         self.assertTrue(asterisk.is_holiday(date(2016, 1, 1)))
 
-    def test_with_ok_bad_holiday(self):
-        self.assertRaises(ParseError, lambda: Holiday([(2016, 1, 1, "test", 1)]))
-        self.assertRaises(PeriodRangeError, lambda: Holiday([(10000, 1, 1, "fri", 1)]))
-        self.assertRaises(PeriodRangeError, lambda: Holiday([(2016, 13, 1, "fri", 1)]))
-        self.assertRaises(PeriodRangeError, lambda: Holiday([(2016, 1, 32, "fri", 1)]))
-        self.assertRaises(PeriodRangeError, lambda: Holiday([(2016, 1, 1, 8, 1)]))
-        self.assertRaises(PeriodRangeError, lambda: Holiday([(2016, 1, 32, "fri", 6)]))
+    def test_with_ok_exception_holiday(self):
+        self.assertRaises(ParseError, lambda: self._makeOne()([(2016, 1, 1, "test", 1)]))
+        self.assertRaises(PeriodRangeError, lambda: self._makeOne()([(10000, 1, 1, "fri", 1)]))
+        self.assertRaises(PeriodRangeError, lambda: self._makeOne()([(2016, 13, 1, "fri", 1)]))
+        self.assertRaises(PeriodRangeError, lambda: self._makeOne()([(2016, 1, 32, "fri", 1)]))
+        self.assertRaises(PeriodRangeError, lambda: self._makeOne()([(2016, 1, 1, 8, 1)]))
+        self.assertRaises(PeriodRangeError, lambda: self._makeOne()([(2016, 1, 32, "fri", 6)]))
 
 
 def test():
