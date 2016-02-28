@@ -127,7 +127,7 @@ class Holiday(object):
                                            "'%s' range: '%d' to '%d'" % (
                                                value, label, start, end))
 
-    def is_holiday(self, date, cron=None):
+    def is_holiday(self, date):
         """ Whether holiday judges
 
         :param datetime date: datetime.date object
@@ -153,12 +153,12 @@ class Holiday(object):
                 return True
         return False
 
-    def is_business_day(self, date, cron=None):
+    def is_business_day(self, date):
         """ Whether the business day
 
         :rtype: bool
         """
-        return not(self.is_holiday)
+        return not(self.is_holiday(date))
 
 
 def _extract_week_number(date):
