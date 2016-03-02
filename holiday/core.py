@@ -115,6 +115,8 @@ class Holiday(object):
                         raise ParseError("'%s' is not day of the week. "
                                          "character is the only '%s'" % (
                                              value, ', '.join(ORDER_WEEK)))
+                elif not isinstance(value, int):
+                    raise TypeError("'%s' is not an int" % value)
 
             if label in ["year", "month", "day", "num_of_week"]:
                 if not isinstance(value, int):
