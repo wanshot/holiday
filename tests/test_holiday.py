@@ -78,7 +78,7 @@ class TestHoliday(unittest.TestCase):
             self.assertRaises(ParseError, lambda: self._makeOne()([(2016, 1, 1, ng, 1)]))
 
     def test_with_ng_float_day_of_week(self):
-        self.assertRaises(TypeError, self._makeOne()([(2016, 1, 1, 1.234, 1)]))
+        self.assertRaises(TypeError, lambda: self._makeOne()([(2016, 1, 1, 1.234, 1)]))
 
     def test_with_ng_exclude_asterisk_and_int_week_of_num(self):
         ng_char_values = [u"×", "test", 1.234]
