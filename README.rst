@@ -1,4 +1,4 @@
-Judgment whether the holiday
+To check whether the holiday
 
 Requiremants
 ----------------
@@ -38,6 +38,7 @@ Usage
 
 .. code-block:: python
 
+   >>> from holiday import Holiday
    >>> holiday = Holiday([
    ...     (2016, 1, 1, 'fri', 1),
    ...     (2016, 1, 2, 'sat', 1),
